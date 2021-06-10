@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
@@ -51,6 +52,49 @@ class ProductController extends Controller
             'description' => $request->description,
         ]);
 
+        return back();
+    }
+
+    public function edit($uuid)
+    {
+        $product = Product::where('uuid', $uuid)->first();
+        return view('admin.product.edit', compact('product'));
+    }
+
+    public function update(Request $request, $uuid)
+    {
+        $product = Product::where('uuid', $uuid)->first();
+
+        if ($request->hasFile('product_image')) {
+            if (File::exists($request->path)) {
+                File::delete($request->path);
+            }
+            $file = $request->file('product_image');
+            $name = time();
+            $ext = $file->getClientOriginalExtension();
+            $newName = $name . '.' . $ext;
+            Storage::putFileAs('public/product', $request->file('product_image'), $newName);
+        } else {
+            $newName = $product->product_image;
+        }
+        $product->update([
+            'name' => $request->name,
+            'regular_price' => $request->regular_price,
+            'discount_type' => $request->discount_type,
+            'discount' => $request->discount,
+            'unit_type' => $request->unit_type,
+            'unit' => $request->unit,
+            'stock' => $request->stock,
+            'product_image' =>  $newName,
+            'description' => $request->description,
+        ]);
+        return back();
+    }
+
+    public function destroy(Request $request, $uuid)
+    {
+        $product = Product::where('uuid', $uuid)->first();
+        $product->delete();
         return back();
     }
 }

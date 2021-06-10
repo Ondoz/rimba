@@ -37,8 +37,12 @@
 								<td>{{$product->unit_format}}</td>
 								<td>{{$product->stock}}</td>
 								<td>
-									<a href="#" type="button" class="btn btn-warning btn-sm deletetransaksi" data-uuid="">Edit</a>
-									<a href="#" type="button" class="btn btn-danger btn-sm deletetransaksi" onclick='alert("Anda Yakin Hapus?");' data-uuid="">Hapus</a>
+									<a href="{{route('product.edit', [$product->uuid])}}" type="button" class="btn btn-warning btn-xs deletetransaksi" data-uuid="">Edit</a>
+									<form action="{{ route('product.destroy', $product->uuid) }}" method="POST" onsubmit="return confirm('{{'Yakin mau di hapus'}}');" style="display: inline-block;">
+                            
+                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                        <input type="submit" class="btn btn-xs btn-danger" value="{{ trans('Delete') }}">
+                                    </form>
 								</td>
 							</tr>
 						@empty

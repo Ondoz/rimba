@@ -34,8 +34,8 @@
                                     <td>{{$user->phone}}</td>
                                     <td>{{$user->address}}</td>
                                     <td>
-                                        <a href="#" type="button" class="btn btn-warning btn-sm deletetransaksi" data-uuid="">Edit</a>
-                                        <a href="#" type="button" class="btn btn-danger btn-sm deletetransaksi" onclick='alert("Anda Yakin Hapus?");' data-uuid="">Hapus</a>
+                                        <a href="#" type="button" class="btn btn-warning btn-xs deletetransaksi" data-uuid="">Edit</a>
+                                        <a href="#" type="button" class="btn btn-danger btn-xs deletetransaksi" onclick='alert("Anda Yakin Hapus?");' data-uuid="">Hapus</a>
                                     </td>
                                 </tr>
                             @endif

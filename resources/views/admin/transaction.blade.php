@@ -14,23 +14,47 @@
 		<table id="example1" class="table table-bordered table-striped">
 			<thead>
 				<tr>
-					<th>Rendering engine</th>
-					<th>Browser</th>
-					<th>Platform(s)</th>
-					<th>Engine version</th>
-					<th>CSS grade</th>
+					<th>Number Order</th>
+					<th>Name</th>
+					<th>Email</th>
+					<th>Products</th>
+					<th>Total</th>
+					<th>Action	</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
-					<td>Trident</td>
-					<td>Internet
-						Explorer 4.0
+				@foreach($transactions as $key => $transaction)
+				<tr data-entry-id="{{ $transaction->id }}">
+					<td>
+						{{$transaction->order_number}}
 					</td>
-					<td>Win 95+</td>
-					<td> 4</td>
-					<td>X</td>
+					<td>
+						{{ $transaction->user->name ?? '' }}
+					</td>
+					<td>
+						{{ $transaction->user->email ?? '' }}
+					</td>
+					<td>
+						<ul>
+						@foreach($transaction->transaction_item as $key => $item)
+							<li>{{ $item->product->name }} ({{ $item->qty }} x {{ $item->product->after_price_regular_format }})</li>
+						@endforeach
+						</ul>
+					</td>
+					<td>
+						{{'Rp ' . number_format($transaction->total)}}
+					</td>
+					<td>
+						<a href="#" type="button" class="btn btn-warning btn-xs deletetransaksi" data-uuid="">Edit</a>
+						
+						<form action="#" method="POST" onsubmit="return confirm('{{ trans('global.areYouSure') }}');" style="display: inline-block;">
+							<input type="hidden" name="_method" value="DELETE">
+							<input type="hidden" name="_token" value="{{ csrf_token() }}">
+							<input type="submit" class="btn btn-xs btn-danger" value="{{ 'Delete' }}">
+						</form>
+					</td>
 				</tr>
+			@endforeach
 		</table>
 	</div>
 	<!-- /.box-body -->
@@ -45,14 +69,14 @@
 				<h4 class="modal-title">Add Customer</h4>
 			</div>
 
-			<form action="#" method="POST" enctype="multipart/form-data">
+			<form action="{{route('order.store')}}" method="POST" enctype="multipart/form-data">
 				<div class="modal-body">
 					@csrf
 
 					@foreach (old('users', ['']) as $index => $oldUser)
 					<div class="form-group">
 						<label for="">Customer</label>
-						<select name="users[]" class="form-control">
+						<select name="users" class="form-control">
 							<option value="">-- choose cutomer --</option>
 							@foreach ($users as $user)
 								@if ($user->id != auth()->id())
@@ -64,8 +88,7 @@
 						</select>
 					</div>
 					@endforeach
-					
-		
+				
 					<div class="card">
 		
 						<div class="card-body">
@@ -74,7 +97,6 @@
 									<tr>
 										<th>Product <br> <span style=" font-weight: normal;">Harga Di Product Sudah Termasuk Potongan Discount</span> </th>
 										<th>Quantity</th>
-										<th>Stock Ready</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -91,10 +113,7 @@
 												</select>
 											</td>
 											<td>
-												<input type="number" name="quantities[]" class="form-control" value="{{ old('quantities.' . $index) ?? '1' }}" />
-											</td>
-											<td>
-												<input type="number" class="form-control stock" value="" readonly/>
+												<input type="number" name="qty[]" class="form-control" value="{{ old('qty.' . $index) ?? '1' }}" />
 											</td>
 										</tr>
 									@endforeach
@@ -135,15 +154,14 @@
 			'autoWidth': false
 		})
 	})
+
 	$(document).ready(function(){
     	let row_number = 1;
 		$("#add_row").click(function(e){
 			e.preventDefault();
 			let new_row_number = row_number - 1;
 			$('#product' + row_number).html($('#product' + new_row_number).html()).find('td:first-child');
-			$('#products_table').append('<tr id="product' + (row_number + 1) + '" class="tester" data-index="' + (row_number + 1) + '"></tr>');
-			data = $('#product' + row_number).attr('data-index');
-			$('.selectProduct' + ,).attr('data-index', data);			
+			$('#products_table').append('<tr id="product' + (row_number + 1) + '" class="tester" data-index="' + (row_number + 1) + '"></tr>');		
 			row_number++;
 		});
 
@@ -154,26 +172,6 @@
 				row_number--;
 			}
 		});
-
-		$(document).on('change','.selectProduct',function(){
-			index = $(this).attr('data-index');
-			// id = $(this).val();
-			   console.log(index);
-            // $.ajax({
-            //     url: "{{route('ajax.get.product')}}",
-            //     dataType: "JSON",
-            //     type: "POST",
-            //     data: {
-            //         _token: '{{csrf_token()}}',
-            //         uuid: id
-            //     },
-            //     success: function(result){
-            //        console.log(result);
-			// 	   console.log(index);
-			// 		$('.stock'+index).val(result.stock);
-            //     },
-            // });
-        })
 
 	});
 </script>
